@@ -90,6 +90,7 @@ services:
       - SUCCESS_URL=${PAYMENTS_SUCCESS_URL}
       - CANCEL_URL=${PAYMENTS_CANCEL_URL}
       - ENDPOINT_SECRET=${PAYMENTS_ENDPOINT_SECRET}
+      - NATS_SERVER=${NATS_SERVER}
     volumes:
       - ./payments-ms/src:/app/src
     command: pnpm start:dev
