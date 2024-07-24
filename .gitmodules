@@ -7,3 +7,6 @@
 [submodule "products-ms"]
 	path = products-ms
 	url = https://github.com/Joletuar/products-ms.git
+[submodule "payments-ms"]
+	path = payments-ms
+	url = https://github.com/Joletuar/payments-ms.git
