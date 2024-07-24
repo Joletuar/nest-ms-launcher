@@ -76,5 +76,23 @@ services:
       - ./client-gateway/src:/app/src
     command: pnpm start:dev
 
+  payments-ms:
+    container_name: payments-ms
+    restart: unless-stopped
+    build:
+      context: ./payments-ms
+      dockerfile: dockerfile
+    ports:
+      - '${PAYMENTS_PORT}:${PAYMENTS_PORT}'
+    environment:
+      - PORT=${PAYMENTS_PORT}
+      - STRIPE_API_KEY=${PAYMENTS_STRIPE_API_KEY}
+      - SUCCESS_URL=${PAYMENTS_SUCCESS_URL}
+      - CANCEL_URL=${PAYMENTS_CANCEL_URL}
+      - ENDPOINT_SECRET=${PAYMENTS_ENDPOINT_SECRET}
+    volumes:
+      - ./payments-ms/src:/app/src
+    command: pnpm start:dev
+
 volumes:
   orders-db-volume:
