@@ -95,5 +95,19 @@ services:
       - ./payments-ms/src:/app/src
     command: pnpm start:dev
 
+  auth-ms:
+    container_name: auth-ms
+    build:
+      context: ./auth-ms
+      dockerfile: dockerfile
+    ports:
+      - ${AUTH_PORT}:${AUTH_PORT}
+    environment:
+      - PORT=${AUTH_PORT}
+      - NATS_SERVER=${NATS_SERVER}
+    volumes:
+      - ./auth-ms/src:/app/src
+    command: pnpm start:dev
+
 volumes:
   orders-db-volume:
