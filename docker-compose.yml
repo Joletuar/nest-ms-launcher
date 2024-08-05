@@ -95,20 +95,7 @@ services:
       - ./payments-ms/src:/app/src
     command: pnpm start:dev
 
-  auth-db:
-    container_name: auth-db
-    image: mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${AUTH_MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${AUTH_MONGO_INITDB_ROOT_PASSWORD}
-    volumes:
-      - auth-db-volume:/data/db
-    ports:
-      - ${AUTH_DATABASE_PORT}:${AUTH_DATABASE_PORT}
-
   auth-ms:
-    depends_on:
-      - auth-db
     restart: unless-stopped
     container_name: auth-ms
     build:
@@ -126,4 +113,6 @@ services:
 
 volumes:
   orders-db-volume:
-  auth-db-volume:
+  auth-mongo-db-1-volume:
+  auth-mongo-db-2-volume:
+  auth-mongo-db-3-volume:
