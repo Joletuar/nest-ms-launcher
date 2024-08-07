@@ -12,6 +12,7 @@ services:
     build:
       context: ./client-gateway
       dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-client-gateway:1.0.0
     environment:
       - NATS_SERVER=${NATS_SERVER}
       - PORT=${GATEWAY_PORT}
@@ -26,6 +27,7 @@ services:
       dockerfile: dockerfile.prod
       args:
         - ORDERS_DATABASE_URL=${ORDERS_DATABASE_URL}
+    image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-orders:1.0.0
     environment:
       - DATABASE_URL=${ORDERS_DATABASE_URL}
       - NATS_SERVER=${NATS_SERVER}
@@ -37,6 +39,7 @@ services:
     build:
       context: ./products-ms
       dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-products:1.0.0
     environment:
       - DATABASE_URL=${PRODUCTS_DATABASE_URL}
       - NATS_SERVER=${NATS_SERVER}
@@ -48,6 +51,7 @@ services:
     build:
       context: ./payments-ms
       dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-payments:1.0.0
     ports:
       - '${PAYMENTS_PORT}:${PAYMENTS_PORT}'
     environment:
@@ -64,6 +68,7 @@ services:
     build:
       context: ./auth-ms
       dockerfile: dockerfile.prod
+    image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-auth:1.0.0
     environment:
       - PORT=${AUTH_PORT}
       - NATS_SERVER=${NATS_SERVER}
