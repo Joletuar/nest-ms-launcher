@@ -73,6 +73,7 @@ services:
       - PORT=${AUTH_PORT}
       - NATS_SERVER=${NATS_SERVER}
       - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${AUTH_JWT_SECRET}
 
 volumes:
   orders-db-volume:
