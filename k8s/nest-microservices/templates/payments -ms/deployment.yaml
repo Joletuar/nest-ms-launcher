@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: payments-ms
+  name: payments-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-ms
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: payments-ms
+    spec:
+      containers:
+        - image: southamerica-west1-docker.pkg.dev/microservices-nest-dev/register-nest-dev/nest-microservices-payments:1.0.0
+          name: nest-microservices-payments
+          env:
+            - name: PORT
+              value: '3000'
+            - name: SUCCESS_URL
+              value: 'https://www.google.com/?hl=es'
+            - name: CANCEL_URL
+              value: 'https://www.google.com/?hl=es'
+            - name: NATS_SERVER
+              value: nats://nats-server
+            - name: STRIPE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secrets
+                  key: STRIPE_API_KEY
+            - name: ENDPOINT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secrets
+                  key: ENDPOINT_SECRET
+
+          resources: {}
+      imagePullSecrets:
+        - name: gcr-json-key
+status: {}
