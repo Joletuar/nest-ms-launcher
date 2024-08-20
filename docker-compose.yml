@@ -1,12 +1,50 @@
 name: nest-microservices
 
 services:
-  nats-server:
+  rabbitmq-server:
     restart: unless-stopped
-    container_name: nats-server
-    image: nats:latest
+    container_name: rabbitmq-server
+    image: rabbitmq:3.12.14-management-alpine
     ports:
-      - ${NATS_UI_PORT}:8222
+      - ${RABBITMQ_UI_PORT}:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+
+  client-gateway:
+    restart: unless-stopped
+    container_name: client-gateway
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile
+      args:
+        - PORT=${GATEWAY_PORT}
+    ports:
+      - '${GATEWAY_PORT}:${GATEWAY_PORT}'
+    environment:
+      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
+      - PORT=${GATEWAY_PORT}
+    volumes:
+      - ./client-gateway/src:/app/src
+    command: pnpm start:dev
+
+  products-ms:
+    depends_on:
+      - rabbitmq-server
+    restart: unless-stopped
+    container_name: products-ms
+    build:
+      context: ./products-ms
+      dockerfile: dockerfile
+      args:
+        - PORT=${PRODUCTS_PORT}
+    environment:
+      - DATABASE_URL=${PRODUCTS_DATABASE_URL}
+      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
+      - PORT=${PRODUCTS_PORT}
+    volumes:
+      - ./products-ms/src:/app/src
+    command: pnpm start:dev
 
   orders-db:
     restart: unless-stopped
@@ -25,6 +63,7 @@ services:
     restart: unless-stopped
     depends_on:
       - orders-db
+      - rabbitmq-server
     container_name: orders-ms
     build:
       context: ./orders-ms
@@ -33,46 +72,15 @@ services:
         - PORT=${ORDERS_PORT}
     environment:
       - DATABASE_URL=${ORDERS_DATABASE_URL}
-      - NATS_SERVER=${NATS_SERVER}
+      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
       - PORT=${ORDERS_PORT}
     volumes:
       - ./orders-ms/src:/app/src
     command: pnpm start:dev
 
-  products-ms:
-    restart: unless-stopped
-    container_name: products-ms
-    build:
-      context: ./products-ms
-      dockerfile: dockerfile
-      args:
-        - PORT=${PRODUCTS_PORT}
-    environment:
-      - DATABASE_URL=${PRODUCTS_DATABASE_URL}
-      - NATS_SERVER=${NATS_SERVER}
-      - PORT=${PRODUCTS_PORT}
-    volumes:
-      - ./products-ms/src:/app/src
-    command: pnpm start:dev
-
-  client-gateway:
-    restart: unless-stopped
-    container_name: client-gateway
-    build:
-      context: ./client-gateway
-      dockerfile: dockerfile
-      args:
-        - PORT=${GATEWAY_PORT}
-    ports:
-      - '${GATEWAY_PORT}:${GATEWAY_PORT}'
-    environment:
-      - NATS_SERVER=${NATS_SERVER}
-      - PORT=${GATEWAY_PORT}
-    volumes:
-      - ./client-gateway/src:/app/src
-    command: pnpm start:dev
-
   payments-ms:
+    depends_on:
+      - rabbitmq-server
     container_name: payments-ms
     restart: unless-stopped
     build:
@@ -86,12 +94,14 @@ services:
       - SUCCESS_URL=${PAYMENTS_SUCCESS_URL}
       - CANCEL_URL=${PAYMENTS_CANCEL_URL}
       - ENDPOINT_SECRET=${PAYMENTS_ENDPOINT_SECRET}
-      - NATS_SERVER=${NATS_SERVER}
+      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
     volumes:
       - ./payments-ms/src:/app/src
     command: pnpm start:dev
 
   auth-ms:
+    depends_on:
+      - rabbitmq-server
     restart: unless-stopped
     container_name: auth-ms
     build:
@@ -99,7 +109,7 @@ services:
       dockerfile: dockerfile
     environment:
       - PORT=${AUTH_PORT}
-      - NATS_SERVER=${NATS_SERVER}
+      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
       - DATABASE_URL=${AUTH_DATABASE_URL}
       - JWT_SECRET=${AUTH_JWT_SECRET}
     volumes:
