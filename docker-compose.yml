@@ -8,8 +8,8 @@ services:
     ports:
       - ${RABBITMQ_UI_PORT}:15672
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
       - rabbitmq-server-volume:/var/lib/rabbitmq
 
@@ -29,10 +29,10 @@ services:
       context: ./client-gateway
       dockerfile: dockerfile
     ports:
-      - '${GATEWAY_PORT}:3000'
+      - '${GATEWAY_PORT}:${GATEWAY_PORT}'
     environment:
-      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
-      - PORT=${GATEWAY_PORT}
+      RABBITMQ_SERVER: ${RABBITMQ_SERVER}
+      PORT: ${GATEWAY_PORT}
     volumes:
       - ./client-gateway/src:/app/src
     command: pnpm start:dev
@@ -47,11 +47,11 @@ services:
       context: ./products-ms
       dockerfile: dockerfile
     environment:
-      - DATABASE_URL=${PRODUCTS_DATABASE_URL}
-      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
-      - PORT=${PRODUCTS_PORT}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_HOST=${REDIS_HOST}
+      DATABASE_URL: ${PRODUCTS_DATABASE_URL}
+      RABBITMQ_SERVER: ${RABBITMQ_SERVER}
+      PORT: ${PRODUCTS_PORT}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_HOST: ${REDIS_HOST}
     volumes:
       - ./products-ms/src:/app/src
     command: pnpm start:dev
@@ -61,9 +61,9 @@ services:
     container_name: orders-db
     image: postgres:15.6-alpine3.19
     environment:
-      - POSTGRES_USER=${ORDERS_POSTGRES_USER}
-      - POSTGRES_PASSWORD=${ORDERS_POSTGRES_PASSWORD}
-      - POSTGRES_DB=${ORDERS_POSTGRES_DB}
+      POSTGRES_USER: ${ORDERS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ORDERS_POSTGRES_DB}
     ports:
       - '${ORDERS_POSTGRES_PORT}:5432'
     volumes:
@@ -79,9 +79,9 @@ services:
       context: ./orders-ms
       dockerfile: dockerfile
     environment:
-      - DATABASE_URL=${ORDERS_DATABASE_URL}
-      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
-      - PORT=${ORDERS_PORT}
+      DATABASE_URL: ${ORDERS_DATABASE_URL}
+      RABBITMQ_SERVER: ${RABBITMQ_SERVER}
+      PORT: ${ORDERS_PORT}
     volumes:
       - ./orders-ms/src:/app/src
     command: pnpm start:dev
@@ -97,12 +97,12 @@ services:
     ports:
       - '${PAYMENTS_PORT}:3000'
     environment:
-      - PORT=${PAYMENTS_PORT}
-      - STRIPE_API_KEY=${PAYMENTS_STRIPE_API_KEY}
-      - SUCCESS_URL=${PAYMENTS_SUCCESS_URL}
-      - CANCEL_URL=${PAYMENTS_CANCEL_URL}
-      - ENDPOINT_SECRET=${PAYMENTS_ENDPOINT_SECRET}
-      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
+      PORT: ${PAYMENTS_PORT}
+      STRIPE_API_KEY: ${PAYMENTS_STRIPE_API_KEY}
+      SUCCESS_URL: ${PAYMENTS_SUCCESS_URL}
+      CANCEL_URL: ${PAYMENTS_CANCEL_URL}
+      ENDPOINT_SECRET: ${PAYMENTS_ENDPOINT_SECRET}
+      RABBITMQ_SERVER: ${RABBITMQ_SERVER}
     volumes:
       - ./payments-ms/src:/app/src
     command: pnpm start:dev
@@ -116,10 +116,10 @@ services:
       context: ./auth-ms
       dockerfile: dockerfile
     environment:
-      - PORT=${AUTH_PORT}
-      - RABBITMQ_SERVER=${RABBITMQ_SERVER}
-      - DATABASE_URL=${AUTH_DATABASE_URL}
-      - JWT_SECRET=${AUTH_JWT_SECRET}
+      PORT: ${AUTH_PORT}
+      RABBITMQ_SERVER: ${RABBITMQ_SERVER}
+      DATABASE_URL: ${AUTH_DATABASE_URL}
+      JWT_SECRET: ${AUTH_JWT_SECRET}
     volumes:
       - ./auth-ms/src:/app/src
     command: pnpm start:dev
